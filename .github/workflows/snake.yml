@@ -1,23 +1,33 @@
 name: Generate Snake
 
 on:
-  schedule: # roda todo dia às 23:59 UTC
+  workflow_dispatch:
+  schedule:
     - cron: "59 23 * * *"
-  workflow_dispatch: # permite rodar manualmente
+
+# dá permissão de escrita pro GITHUB_TOKEN (necessário pra criar o branch output)
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Generate Snake Animation
         uses: Platane/snk@v3
         with:
           github_user_name: gabrielkauee
           outputs: dist/snake.svg dist/snake-dark.svg
+
+      # passo de debug pra garantir que os arquivos foram criados
+      - name: Debug – show generated files
+        run: |
+          echo "PWD=$(pwd)"
+          ls -la
+          echo "dist content:"
+          ls -la dist
 
       - name: Push to output branch
         uses: crazy-max/ghaction-github-pages@v3.1.0
